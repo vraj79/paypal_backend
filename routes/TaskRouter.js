@@ -13,9 +13,25 @@ TaskRouter.post("/",async(req,res)=>{
 })
 
 TaskRouter.get("/",async(req,res)=>{
+    const {status}=req.query
     try {
-        let tasks=await TaskModel.find();
+        if(status){
+            let tasks=await TaskModel.find({status:status});
         return res.status(200).json(tasks);
+        }else{
+            let tasks=await TaskModel.find();
+            return res.status(200).json(tasks);
+        }
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+})
+
+TaskRouter.get("/:id",async(req,res)=>{
+    const {id}=req.params
+    try {
+        let task=await TaskModel.findById(id);
+        return res.status(200).json(task);
     } catch (error) {
         return res.status(400).json({ message: error.message });
     }
@@ -30,5 +46,27 @@ TaskRouter.get("/byStatus",async(req,res)=>{
         return res.status(400).json({ message: error.message });
     }
 })
+
+TaskRouter.patch("/:id",async(req,res)=>{
+    const {id}=req.params
+    try {
+        let task=await TaskModel.findByIdAndUpdate({_id:id},{...req.body});
+        return res.status(200).json({msg:"Task Updated"});
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+})
+
+TaskRouter.delete("/:id",async(req,res)=>{
+    const {id}=req.params
+    try {
+        let task=await TaskModel.findByIdAndDelete(id);
+        return res.status(200).json({msg:"Task Deleted"});
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+})
+
+
 
 module.exports=TaskRouter
